@@ -2,6 +2,7 @@ package com.ibt.nirmal.gmap;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,12 +21,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -42,25 +45,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
+    private LocationManager locationManager;
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-       // getSupportActionBar().setTitle("Map Location Activity");
+        // getSupportActionBar().setTitle("Map Location Activity");
 
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
 
-        Location location  = new Location(LocationManager.NETWORK_PROVIDER);//provider name is unnecessary
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+
+        Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
 
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
 
         //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
         LatLng latLng = new LatLng(latitude, longitude);
+
     }
 
     @Override
@@ -78,8 +98,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap)
     {
         mGoogleMap=googleMap;
+        mGoogleMap.clear();
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mGoogleMap.setIndoorEnabled(true);
+        //mGoogleMap.setIndoorEnabled(true);
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -88,28 +109,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     == PackageManager.PERMISSION_GRANTED) {
                 //Location Permission already granted
                 buildGoogleApiClient();
-
-                Location location  = new Location(LocationManager.NETWORK_PROVIDER);//provider name is unnecessary
+/*
+                Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
 
                 double longitude = location.getLongitude();
                 double latitude = location.getLatitude();
                 //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
                 LatLng latLng = new LatLng(latitude, longitude);
+
+
+                //move map camera
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
+                mGoogleMap.setMyLocationEnabled(true);
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Your Location");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                 mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
 
-                //move map camera
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18));
-                //mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18.0f));
-               // mGoogleMap.setMyLocationEnabled(true);
                 Calendar c = Calendar.getInstance();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 String formattedDate = df.format(c.getTime());
                 // formattedDate have current date/time
-                Toast.makeText(this, formattedDate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, formattedDate, Toast.LENGTH_SHORT).show();*/
+
             } else {
                 //Request Location Permission
                 checkLocationPermission();
@@ -118,26 +142,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else {
             buildGoogleApiClient();
 
-            Location location  = new Location(LocationManager.NETWORK_PROVIDER);//provider name is unnecessary
+          /*  Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
 
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
             LatLng latLng = new LatLng(latitude, longitude);
 
             //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
+
+
+            //move map camera
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
+            mGoogleMap.setMyLocationEnabled(true);
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("Your Location");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
 
-            //move map camera
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18));
-           // mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18.0f));
-           // mGoogleMap.setMyLocationEnabled(true);
             Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
+            String formattedDate = df.format(c.getTime());*/
         }
     }
 
@@ -173,6 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location)
     {
+       /* mGoogleMap.clear();
         mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
@@ -181,18 +208,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
-        MarkerOptions markerOptions = new MarkerOptions();
+
+
+        //move map camera
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
+        mGoogleMap.setMyLocationEnabled(true);
+
+      *//*  MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Your Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+        mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);*//*
 
-        //move map camera
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18));
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String formattedDate = df.format(c.getTime());
+        String formattedDate = df.format(c.getTime());*/
 
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+        mGoogleMap.animateCamera(cameraUpdate);
+        locationManager.removeUpdates(this);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Your Location");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
     }
 
     @Override
