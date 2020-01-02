@@ -109,30 +109,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     == PackageManager.PERMISSION_GRANTED) {
                 //Location Permission already granted
                 buildGoogleApiClient();
-/*
+
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+
                 Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
 
                 double longitude = location.getLongitude();
                 double latitude = location.getLatitude();
+
                 //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
                 LatLng latLng = new LatLng(latitude, longitude);
-
-
-                //move map camera
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
-                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
-                mGoogleMap.setMyLocationEnabled(true);
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Your Location");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
-
-                Calendar c = Calendar.getInstance();
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                String formattedDate = df.format(c.getTime());
-                // formattedDate have current date/time
-                Toast.makeText(this, formattedDate, Toast.LENGTH_SHORT).show();*/
 
             } else {
                 //Request Location Permission
@@ -142,28 +128,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else {
             buildGoogleApiClient();
 
-          /*  Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+
+            Location location  = new Location(LocationManager.GPS_PROVIDER);//provider name is unnecessary
 
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
-            LatLng latLng = new LatLng(latitude, longitude);
 
             //LatLng latLng = new LatLng(11.0094608, 76.95913399999995);
-
-
-            //move map camera
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
-            mGoogleMap.setMyLocationEnabled(true);
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Your Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
-
-            Calendar c = Calendar.getInstance();
-            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            String formattedDate = df.format(c.getTime());*/
+            LatLng latLng = new LatLng(latitude, longitude);
         }
     }
 
